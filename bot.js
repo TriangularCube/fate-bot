@@ -9,9 +9,24 @@ bot.on("ready", () => console.log("Bot is ready"));
 
 const random = new Random(nodeCrypto);
 const rollDice = () => {
-    let value = 0;
-    [1, 2, 3, 4].forEach( i => value += random.integer(-1, 1));
-    return value;
+    let total = 0;
+    const rollValues = [];
+    [1, 2, 3, 4].forEach( i => {
+        const randomValue = random.integer(-1, 1);
+        total += randomValue;
+        switch (randomValue) {
+            case 0:
+                rollValues.push("O");
+                break;
+            case 1:
+                rollValues.push("+");
+                break;
+            case -1:
+                rollValues.push("-");
+                break;
+        }
+    });
+    return {total, rollValues};
 }
 
 const ladder = [
@@ -27,16 +42,22 @@ const ladder = [
     "Epic",
     "Legendary"
 ];
-const makeMessage = (modifier) => {
+const makeMessage = (roll, modifier) => {
+
+    let total = roll.total + modifier
     let adjective;
-    if( modifier > 8 ){
+
+    if( total > 8 ){
         adjective = ladder[10];
-    } else if( modifier < -2 ){
+    } else if( total < -2 ){
         adjective = ladder[0];
     } else {
-        adjective = ladder[modifier + 2];
+        adjective = ladder[total + 2];
     }
-    return `You rolled { ${modifier} } (${adjective})`;
+
+    const modifierString = modifier > -1 ? `+${modifier}` : modifier
+
+    return `You rolled { ${total} } (${adjective})\n{ ${roll.rollValues.join(" ")} } and ${modifierString}`;
 }
 
 bot.on("messageCreate", msg => {
@@ -46,25 +67,22 @@ bot.on("messageCreate", msg => {
 
     let tokens = msg.content.split(" ");
 
-    let modifier;
+    let modifier = 0
     let error = false;
 
-    if( tokens.length < 2 ){
-        modifier = rollDice();
-    } else {
+    if( tokens.length > 1 ){
         const parsed = parseInt(tokens[1])
 
         if(isNaN(parsed)){
-            modifier = rollDice();
             error = true;
         } else {
-            modifier = parseInt(tokens[1]) + rollDice();
+            modifier = parsed
         }
     }
 
-    let response = makeMessage(modifier);
+    let response = makeMessage(rollDice(), modifier);
     if( error ){
-        response = `Could not parse modifier, using 0:\n${response}`;
+        response = `Could not parse modifier`;
     }
 
     bot.createMessage(msg.channel.id, response);
