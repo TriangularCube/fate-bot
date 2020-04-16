@@ -39,8 +39,7 @@ const makeMessage = (modifier) => {
     return `You rolled { ${modifier} } (${adjective})`;
 }
 
-bot.on("createMessage", msg => {
-
+bot.on("messageCreate", msg => {
     if( !msg.content.match(/^\/fate/) ){
         return;
     }
@@ -50,14 +49,16 @@ bot.on("createMessage", msg => {
     let modifier;
     let error = false;
 
-    if( tokens.length < 3 ){
-        modifier = 0;
+    if( tokens.length < 2 ){
+        modifier = rollDice();
     } else {
-        try {
-            modifier = rollDice(parseInt(tokens[3]));
-        } catch ( e ){
-            modifier = rollDice(0);
+        const parsed = parseInt(tokens[1])
+
+        if(isNaN(parsed)){
+            modifier = rollDice();
             error = true;
+        } else {
+            modifier = parseInt(tokens[1]) + rollDice();
         }
     }
 
