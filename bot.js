@@ -1,15 +1,17 @@
+require('dotenv').config()
+
 const Eris = require("eris");
-const { Random, nodeCrypto } = require("random-js")
- 
-let bot = new Eris(process.env.DISCORD_BOT_TOKEN)
+const { Random, nodeCrypto } = require("random-js");
 
-bot.on("ready", () => console.log("Bot is ready"))
+let bot = new Eris(process.env.DISCORD_BOT_TOKEN);
 
-const random = new Random(nodeCrypto)
+bot.on("ready", () => console.log("Bot is ready"));
+
+const random = new Random(nodeCrypto);
 const rollDice = () => {
-    let value = 0
-    [1, 2, 3, 4].forEach( i => value += random.integer(-1, 1))
-    return value
+    let value = 0;
+    [1, 2, 3, 4].forEach( i => value += random.integer(-1, 1));
+    return value;
 }
 
 const ladder = [
@@ -24,48 +26,48 @@ const ladder = [
     "Fantastic",
     "Epic",
     "Legendary"
-]
+];
 const makeMessage = (modifier) => {
-    let adjective
+    let adjective;
     if( modifier > 8 ){
-        adjective = ladder[10]
+        adjective = ladder[10];
     } else if( modifier < -2 ){
-        adjective = ladder[0]
+        adjective = ladder[0];
     } else {
-        adjective = ladder[modifier + 2]
+        adjective = ladder[modifier + 2];
     }
-    return `You rolled { ${modifier} } (${adjective})`
+    return `You rolled { ${modifier} } (${adjective})`;
 }
 
 bot.on("createMessage", msg => {
 
     if( !msg.content.match(/^\/fate/) ){
-        return
+        return;
     }
 
-    let tokens = msg.content.split(" ")
+    let tokens = msg.content.split(" ");
 
-    let modifier
-    let error = false
+    let modifier;
+    let error = false;
 
     if( tokens.length < 3 ){
-        modifier = 0
+        modifier = 0;
     } else {
         try {
-            modifier = parseInt(tokens[3])
+            modifier = rollDice(parseInt(tokens[3]));
         } catch ( e ){
-            modifier = 0
-            error = true
+            modifier = rollDice(0);
+            error = true;
         }
     }
 
-    let response = makeMessage(modifier)
+    let response = makeMessage(modifier);
     if( error ){
-        response = `Could not parse modifier, using 0:\n${response}`
+        response = `Could not parse modifier, using 0:\n${response}`;
     }
 
-    bot.createMessage(msg.channel.id, response)
+    bot.createMessage(msg.channel.id, response);
 
 })
 
-bot.connect()
+bot.connect();
