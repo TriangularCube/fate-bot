@@ -63,7 +63,7 @@ const makeMessage = (roll, modifier, runes) => {
 
     const modifierString = modifier > -1 ? `+${modifier}` : modifier
 
-    return `You rolled { ${total} } (${adjective})\n{ ${rollArray.join(" ")} } with ${modifierString}`;
+    return `You rolled { ${total} } (${adjective})\n${rollArray.join(" ")} with ${modifierString}`;
 }
 
 bot.on("messageCreate", msg => {
