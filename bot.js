@@ -14,17 +14,7 @@ const rollDice = () => {
     [1, 2, 3, 4].forEach( i => {
         const randomValue = random.integer(-1, 1);
         total += randomValue;
-        switch (randomValue) {
-            case 0:
-                rollValues.push("O");
-                break;
-            case 1:
-                rollValues.push("+");
-                break;
-            case -1:
-                rollValues.push("-");
-                break;
-        }
+        rollValues.push(randomValue)
     });
     return {total, rollValues};
 }
@@ -42,7 +32,12 @@ const ladder = [
     "Epic",
     "Legendary"
 ];
-const makeMessage = (roll, modifier) => {
+const defaultRunes = {
+        plus: "+",
+        minus: "-",
+        zero: "O"
+}
+const makeMessage = (roll, modifier, runes) => {
 
     let total = roll.total + modifier
     let adjective;
@@ -55,9 +50,20 @@ const makeMessage = (roll, modifier) => {
         adjective = ladder[total + 2];
     }
 
+    let rollArray = roll.rollValues.map( value => {
+        switch ( value ) {
+            case 1:
+                return runes.plus;
+            case -1:
+                return runes.minus;
+            case 0:
+                return runes.zero;
+        }
+    })
+
     const modifierString = modifier > -1 ? `+${modifier}` : modifier
 
-    return `You rolled { ${total} } (${adjective})\n{ ${roll.rollValues.join(" ")} } and ${modifierString}`;
+    return `You rolled { ${total} } (${adjective})\n{ ${rollArray.join(" ")} } with ${modifierString}`;
 }
 
 bot.on("messageCreate", msg => {
@@ -80,9 +86,20 @@ bot.on("messageCreate", msg => {
         }
     }
 
-    let response = makeMessage(rollDice(), modifier);
+    const emojis = msg.channel.guild.emojis;
+    const emojiNames = emojis.map(emoji => emoji.name);
+    let runes = defaultRunes;
+    if(emojiNames.includes("fatezero") && emojiNames.includes("fateplus") && emojiNames.includes("fateminus")) {
+        runes = {
+            plus: `<:fateplus:${emojis.find(emoji => emoji.name === "fateplus").id}>`,
+            minus: `<:fateminus:${emojis.find(emoji => emoji.name === "fateminus").id}>`,
+            zero: `<:fatezero:${emojis.find(emoji => emoji.name === "fatezero").id}>`
+        }
+    }
+
+    let response = makeMessage(rollDice(), modifier, runes);
     if( error ){
-        response = `Could not parse modifier`;
+        response = `Could not parse modifier\n${response}`;
     }
 
     bot.createMessage(msg.channel.id, response);

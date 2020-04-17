@@ -4,7 +4,7 @@
   "description": "A bot for rolling Fate/Fudge Dice",
   "main": "bot.js",
   "scripts": {
-    "start": "node bot.js"
+    "start": "nodemon bot.js"
   },
   "keywords": [],
   "author": "Michael",
@@ -13,5 +13,8 @@
     "dotenv": "^8.2.0",
     "eris": "^0.12.0",
     "random-js": "^2.1.0"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.3"
   }
 }
