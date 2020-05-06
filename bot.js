@@ -86,14 +86,17 @@ bot.on("messageCreate", msg => {
         }
     }
 
-    const emojis = msg.channel.guild.emojis;
-    const emojiNames = emojis.map(emoji => emoji.name);
     let runes = defaultRunes;
-    if(emojiNames.includes("fatezero") && emojiNames.includes("fateplus") && emojiNames.includes("fateminus")) {
-        runes = {
-            plus: `<:fateplus:${emojis.find(emoji => emoji.name === "fateplus").id}>`,
-            minus: `<:fateminus:${emojis.find(emoji => emoji.name === "fateminus").id}>`,
-            zero: `<:fatezero:${emojis.find(emoji => emoji.name === "fatezero").id}>`
+
+    if( msg.channel.guild && msg.channel.guild.emojis ){
+        const emojis = msg.channel.guild.emojis;
+        const emojiNames = emojis.map(emoji => emoji.name);
+        if(emojiNames.includes("fatezero") && emojiNames.includes("fateplus") && emojiNames.includes("fateminus")) {
+            runes = {
+                plus: `<:fateplus:${emojis.find(emoji => emoji.name === "fateplus").id}>`,
+                minus: `<:fateminus:${emojis.find(emoji => emoji.name === "fateminus").id}>`,
+                zero: `<:fatezero:${emojis.find(emoji => emoji.name === "fatezero").id}>`
+            }
         }
     }
 
