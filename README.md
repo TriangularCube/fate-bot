@@ -1,8 +1,5 @@
 This is a Discord bot for FATE Core System
 
-You can add this bot to your server by using
-[this link](https://discordapp.com/api/oauth2/authorize?client_id=700420012313411685&permissions=0&scope=bot)
-
 Currently the only feature is to roll 4 Fate dice. I may expand the bot in the future.
 
 ### Commands
